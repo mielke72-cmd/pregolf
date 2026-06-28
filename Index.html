@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre-Round Routine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  :root {
+    --grass:      #2d6a32;
+    --grass-mid:  #3a7a40;
+    --grass-lt:   #eef5ee;
+    --grass-bd:   #c2d9c4;
+    --sky:        #1a6fa3;
+    --sky-lt:     #e7f2fb;
+    --sand:       #a87830;
+    --sand-lt:    #fdf4e3;
+    --ink:        #18201a;
+    --ink-2:      #3a4a3c;
+    --ink-3:      #6b7b6d;
+    --ink-4:      #9eaf9f;
+    --page:       #f5f8f5;
+    --card:       #ffffff;
+    --border:     #dde7dd;
+    --border-str: #c2d4c3;
+    --radius:     10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--page);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    background: var(--grass);
+    padding: 0 1.5rem;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    max-width: 640px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 16px;
+  }
+  .logo-text { font-size: 15px; font-weight: 600; color: white; }
+  .logo-sub  { font-size: 11px; color: rgba(255,255,255,0.65); font-weight: 400; }
+
+  .header-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; font-weight: 500;
+    color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px; padding: 3px 10px;
+  }
+
+  /* ── Main ── */
+  .main {
+    max-width: 640px; margin: 0 auto;
+    padding: 1.5rem 1.25rem 5rem;
+  }
+
+  /* ── Summary bar ── */
+  .summary {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 1.5rem;
+  }
+  .sum-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 10px 12px; text-align: center;
+  }
+  .sum-num { font-size: 22px; font-weight: 600; color: var(--grass); font-family: 'DM Mono', monospace; }
+  .sum-lbl { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+
+  /* ── Progress strip ── */
+  .progress-wrap { margin-bottom: 1.25rem; }
+  .progress-track {
+    height: 4px; background: var(--border);
+    border-radius: 4px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--grass);
+    border-radius: 4px;
+    transition: width 0.35s ease;
+    width: 0%;
+  }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--ink-4);
+    font-family: 'DM Mono', monospace;
+    margin-top: 5px;
+  }
+
+  /* ── Step cards ── */
+  .step-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .step {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .step.s-active {
+    border-color: var(--grass);
+    box-shadow: 0 0 0 3px var(--grass-lt);
+  }
+  .step.s-done { opacity: 0.5; }
+
+  .step-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; cursor: pointer;
+    user-select: none;
+  }
+
+  .step-badge {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+    background: var(--page); border: 1px solid var(--border);
+    color: var(--ink-4);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .step.s-active .step-badge {
+    background: var(--grass); color: white; border-color: var(--grass);
+  }
+  .step.s-done .step-badge {
+    background: var(--grass-lt); color: var(--grass); border-color: var(--grass-bd);
+    font-size: 16px;
+  }
+
+  .step-info { flex: 1; min-width: 0; }
+  .step-name { font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.2; }
+  .step-sub  { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+
+  .step-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; font-weight: 500;
+    padding: 4px 10px; border-radius: 20px;
+    background: var(--page); border: 1px solid var(--border);
+    color: var(--ink-3); white-space: nowrap; flex-shrink: 0;
+  }
+  .step.s-active .step-pill {
+    background: var(--grass-lt); border-color: var(--grass-bd);
+    color: var(--grass);
+  }
+
+  .step-expand { display: none; padding: 0 14px 14px 58px; }
+  .step.s-open .step-expand { display: block; }
+
+  .exp-divider {
+    height: 1px; background: var(--border); margin-bottom: 12px;
+  }
+  .exp-desc {
+    font-size: 13px; color: var(--ink-2); line-height: 1.55; margin-bottom: 8px;
+  }
+  .exp-focus {
+    font-size: 12px; color: var(--grass-mid);
+    background: var(--grass-lt); border: 1px solid var(--grass-bd);
+    border-radius: 7px; padding: 8px 11px; line-height: 1.5;
+  }
+  .exp-focus::before { content: '↳ '; color: var(--grass); }
+
+  /* Timer countdown (active step) */
+  .step-timer {
+    display: none; align-items: center; gap: 8px;
+    margin-top: 10px;
+  }
+  .step.s-active .step-timer { display: flex; }
+  .timer-track {
+    flex: 1; height: 3px; background: var(--border); border-radius: 3px; overflow: hidden;
+  }
+  .timer-fill {
+    height: 100%; background: var(--grass); border-radius: 3px;
+    transition: width 1s linear;
+  }
+  .timer-num {
+    font-family: 'DM Mono', monospace; font-size: 12px;
+    color: var(--grass); font-weight: 500; min-width: 28px; text-align: right;
+  }
+
+  /* ── CTA area ── */
+  .cta-area {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, var(--page) 70%, transparent);
+    padding: 1rem 1.25rem 1.25rem;
+    z-index: 50;
+  }
+  .cta-inner { max-width: 640px; margin: 0 auto; display: flex; gap: 8px; }
+  .btn-reset {
+    padding: 12px 18px; font-family: inherit; font-size: 14px; font-weight: 500;
+    background: var(--card); border: 1px solid var(--border-str);
+    border-radius: var(--radius); cursor: pointer; color: var(--ink-3);
+    transition: background 0.12s;
+  }
+  .btn-reset:hover { background: var(--page); }
+  .btn-next {
+    flex: 1; padding: 12px; font-family: inherit; font-size: 15px; font-weight: 600;
+    background: var(--grass); color: white; border: none;
+    border-radius: var(--radius); cursor: pointer;
+    transition: background 0.12s, opacity 0.12s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-next:hover { background: var(--grass-mid); }
+  .btn-next:disabled { opacity: 0.45; cursor: default; }
+
+  /* ── Done screen ── */
+  .done-screen {
+    display: none; text-align: center; padding: 2.5rem 1.5rem;
+    background: var(--card); border: 1px solid var(--grass-bd);
+    border-radius: 14px; margin-top: 0.5rem;
+  }
+  .done-icon {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--grass-lt); border: 2px solid var(--grass-bd);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: var(--grass); margin: 0 auto 1rem;
+  }
+  .done-title { font-size: 20px; font-weight: 600; color: var(--grass); }
+  .done-sub   { font-size: 14px; color: var(--ink-3); margin-top: 6px; line-height: 1.5; }
+  .done-tip   {
+    margin-top: 1.25rem; font-size: 13px; color: var(--ink-2);
+    background: var(--sand-lt); border: 1px solid #e8d3a6;
+    border-radius: 8px; padding: 10px 14px; text-align: left; line-height: 1.5;
+  }
+  .done-tip strong { color: var(--sand); }
+
+  @media (max-width: 480px) {
+    .summary { grid-template-columns: repeat(3, 1fr); }
+    .main { padding: 1rem 1rem 5rem; }
+    .site-header { padding: 0 1rem; }
+    .sum-num { font-size: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon" aria-hidden="true"><i class="ti ti-golf"></i></div>
+      <div>
+        <div class="logo-text">Pre-Round Routine</div>
+        <div class="logo-sub">Tee box ready in 5 minutes</div>
+      </div>
+    </div>
+    <div class="header-badge">5 min</div>
+  </div>
+</header>
+
+<main class="main">
+
+  <div class="summary">
+    <div class="sum-card">
+      <div class="sum-num" id="sumSteps">5</div>
+      <div class="sum-lbl">movements</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-num">5:00</div>
+      <div class="sum-lbl">total time</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-num" id="sumDone">0</div>
+      <div class="sum-lbl">completed</div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label">
+      <span id="progressLeft">0 of 5 done</span>
+      <span id="progressTime">5:00 remaining</span>
+    </div>
+  </div>
+
+  <div class="step-list" id="stepList"></div>
+  <div class="done-screen" id="doneScreen">
+    <div class="done-icon" aria-hidden="true"><i class="ti ti-golf"></i></div>
+    <div class="done-title">Ready to play</div>
+    <div class="done-sub">Hips warm, t-spine open, swing pattern rehearsed.<br>Commit to your pre-shot routine.</div>
+    <div class="done-tip">
+      <strong>Remember on the first tee:</strong> take one more slow practice swing and feel the low point under the ball before you address it. Start your round with a smooth 80% swing — don't try to hit the cover off it until you're warmed up from play.
+    </div>
+  </div>
+
+</main>
+
+<div class="cta-area">
+  <div class="cta-inner">
+    <button class="btn-reset" onclick="reset()" aria-label="Reset routine">
+      <i class="ti ti-refresh" aria-hidden="true"></i> Reset
+    </button>
+    <button class="btn-next" id="nextBtn" onclick="advance()">
+      Start <i class="ti ti-arrow-right" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>
+
+<script>
+const steps = [
+  {
+    name: "90/90 hip switches",
+    meta: "Seated on ground · 5 each side",
+    dur: "1:00", secs: 60,
+    desc: "Sit on the ground, both knees bent at 90°. Slowly rotate your hips to switch between left and right — front leg becomes back leg and vice versa. Take 3–4 seconds each way. Keep your back tall.",
+    focus: "Your L5-S1 means your hips must rotate so your lumbar spine doesn't have to. Cold hips = compensating back in the swing."
+  },
+  {
+    name: "Standing hip circles",
+    meta: "Hold driver upright for balance · 8 each leg",
+    dur: "0:45", secs: 45,
+    desc: "Hold your driver grip-down for balance. Lift one knee and draw large, slow circles — forward, out, back, in. Reverse the direction. Then swap legs. Keep circles big and unhurried.",
+    focus: "Warms the hip joint capsule dynamically. Easier than floor work beside the tee."
+  },
+  {
+    name: "World's greatest stretch",
+    meta: "5 each side · slow and deliberate",
+    dur: "1:00", secs: 60,
+    desc: "Step into a deep lunge. Place both hands inside your front foot on the ground. Rotate your top arm toward the sky, following with your eyes. Pause 2 seconds at the top, then return and switch sides.",
+    focus: "Hip flexors, thoracic rotation, and shoulder mobility in one move — all three things your swing needs."
+  },
+  {
+    name: "Thoracic rotation in posture",
+    meta: "Club across shoulders · 10 each direction",
+    dur: "1:00", secs: 60,
+    desc: "Place your club across your shoulders with arms folded over it. Take your golf posture — hips hinged, knees soft, back straight. Rotate upper body left then right, pausing 1 second at each end. Lower body stays still.",
+    focus: "Warms the t-spine rotation your backswing depends on. Doing it in golf posture makes it pattern-specific."
+  },
+  {
+    name: "Slow practice swings",
+    meta: "7 iron or hybrid · 10 swings at 50% speed",
+    dur: "1:15", secs: 75,
+    desc: "10 swings at half speed. Focus on three things only: (1) full hip turn to the top, (2) low point under the imaginary ball, (3) weight fully onto your lead side at finish. Feel the motion — don't aim at anything.",
+    focus: "Your nervous system needs rehearsal reps before full-speed loading. This is where feel becomes swing and the fear-deceleration pattern stays away."
+  }
+];
+
+let current = -1;
+let timerInterval = null;
+let timerSecsLeft = 0;
+let openSteps = new Set();
+
+function buildList() {
+  const list = document.getElementById('stepList');
+  list.innerHTML = '';
+  steps.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'step';
+    el.id = 'step' + i;
+    el.innerHTML = `
+      <div class="step-head" onclick="toggleOpen(${i})" role="button" aria-expanded="false" id="head${i}">
+        <div class="step-badge" id="badge${i}">${i + 1}</div>
+        <div class="step-info">
+          <div class="step-name">${s.name}</div>
+          <div class="step-sub">${s.meta}</div>
+        </div>
+        <div class="step-pill" id="pill${i}">${s.dur}</div>
+      </div>
+      <div class="step-expand" id="expand${i}">
+        <div class="exp-divider"></div>
+        <div class="exp-desc">${s.desc}</div>
+        <div class="exp-focus">${s.focus}</div>
+        <div class="step-timer">
+          <div class="timer-track"><div class="timer-fill" id="tfill${i}" style="width:100%"></div></div>
+          <div class="timer-num" id="tnum${i}">${s.dur}</div>
+        </div>
+      </div>`;
+    list.appendChild(el);
+  });
+}
+
+function toggleOpen(i) {
+  const el = document.getElementById('step' + i);
+  const head = document.getElementById('head' + i);
+  if (openSteps.has(i)) {
+    openSteps.delete(i);
+    el.classList.remove('s-open');
+    head.setAttribute('aria-expanded', 'false');
+  } else {
+    openSteps.add(i);
+    el.classList.add('s-open');
+    head.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function clearTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+function startTimer(i) {
+  clearTimer();
+  const total = steps[i].secs;
+  timerSecsLeft = total;
+  updateTimerDisplay(i, total, total);
+  timerInterval = setInterval(() => {
+    timerSecsLeft--;
+    updateTimerDisplay(i, timerSecsLeft, total);
+    if (timerSecsLeft <= 0) clearTimer();
+  }, 1000);
+}
+
+function updateTimerDisplay(i, left, total) {
+  const fill = document.getElementById('tfill' + i);
+  const num  = document.getElementById('tnum' + i);
+  if (!fill || !num) return;
+  const pct = Math.max(0, (left / total) * 100);
+  fill.style.width = pct + '%';
+  const m = Math.floor(Math.abs(left) / 60);
+  const s = Math.abs(left) % 60;
+  num.textContent = (left < 0 ? '+' : '') + m + ':' + s.toString().padStart(2, '0');
+}
+
+function updateProgress() {
+  const done = Math.max(0, current);
+  const total = steps.length;
+  const pct = (done / total) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLeft').textContent = done + ' of ' + total + ' done';
+  document.getElementById('sumDone').textContent = done;
+
+  const remaining = steps.slice(Math.max(0, current)).reduce((a, s) => a + s.secs, 0);
+  const m = Math.floor(remaining / 60);
+  const s = remaining % 60;
+  document.getElementById('progressTime').textContent = m + ':' + s.toString().padStart(2,'0') + ' remaining';
+}
+
+function advance() {
+  clearTimer();
+  current++;
+
+  if (current >= steps.length) {
+    document.getElementById('stepList').style.opacity = '0.35';
+    document.getElementById('doneScreen').style.display = 'block';
+    document.getElementById('nextBtn').disabled = true;
+    document.getElementById('nextBtn').innerHTML = 'Done <i class="ti ti-check" aria-hidden="true"></i>';
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressLeft').textContent = steps.length + ' of ' + steps.length + ' done';
+    document.getElementById('sumDone').textContent = steps.length;
+    document.getElementById('progressTime').textContent = '0:00 remaining';
+    return;
+  }
+
+  steps.forEach((_, i) => {
+    const el   = document.getElementById('step' + i);
+    const head = document.getElementById('head' + i);
+    const badge = document.getElementById('badge' + i);
+    el.classList.remove('s-active', 's-done', 's-open');
+    head.setAttribute('aria-expanded', 'false');
+    openSteps.delete(i);
+
+    if (i < current) {
+      el.classList.add('s-done');
+      badge.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i>';
+    }
+    if (i === current) {
+      el.classList.add('s-active', 's-open');
+      head.setAttribute('aria-expanded', 'true');
+      openSteps.add(i);
+      startTimer(i);
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+    }
+  });
+
+  const isLast = current === steps.length - 1;
+  document.getElementById('nextBtn').innerHTML = isLast
+    ? 'Finish <i class="ti ti-check" aria-hidden="true"></i>'
+    : 'Next <i class="ti ti-arrow-right" aria-hidden="true"></i>';
+
+  updateProgress();
+}
+
+function reset() {
+  clearTimer();
+  current = -1;
+  openSteps.clear();
+  document.getElementById('doneScreen').style.display = 'none';
+  document.getElementById('stepList').style.opacity = '1';
+  document.getElementById('nextBtn').disabled = false;
+  document.getElementById('nextBtn').innerHTML = 'Start <i class="ti ti-arrow-right" aria-hidden="true"></i>';
+  buildList();
+  updateProgress();
+}
+
+buildList();
+updateProgress();
+</script>
+</body>
+</html>
